@@ -1,0 +1,112 @@
+/* Put your CSS here */
+
+.container-wrap {	
+  min-height: 20px;  
+  margin-bottom: 20px;
+  margin-top: 20px;
+  background-color: #fdfdfd;
+  border: 1px solid #e3e3e3;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+		  
+}
+
+.navbar .brand {
+  display: block;
+  float: left;
+  padding: 10px;
+  margin-left: 0;
+  font-size: 20px;
+  font-weight: 200;
+  color: #777777;
+  text-shadow: 0 1px 0 #ffffff;
+}
+
+.play-list .table tbody tr.active > td, a.active{
+    background-color: #DFF0D8;
+}
+
+.play-list .table tbody tr > td {
+	padding: 0;
+}
+
+.play-list {
+    float: right;
+    height: 500px;
+    margin-right: 20px;
+	margin-bottom: 20px;
+    overflow: auto;
+}
+
+.play-list  a.active {
+	background-color: #DFF0D8;
+}
+
+.play-list table a {
+	float: left;
+	padding: 8px 0px;
+	width: 100%;
+}
+
+.cont {
+    float: left;
+    margin: 10px 10px;
+    padding: 5px;
+    cursor: pointer;
+    width: 100px;
+    overflow-x: hidden;
+	text-decoration: none;
+}
+
+.cont:hover {
+    background-color: #F5F5F5;
+	text-decoration: none;
+}
+
+.cont > img {
+    height: 100px;
+    width: 100px;
+}
+
+.cont > span {
+    display: block;
+    white-space: nowrap;
+}
+
+.span1-5 {
+    width: 110px;
+}
+
+.round-btn-15 {
+    border-radius: 15px !important;
+}
+
+.round-btn-25 {
+    border-radius: 25px !important;
+}
+
+.navbar .btn-group {
+	margin-top: 15px;
+}
+
+.navbar-inner {
+	height: 108px;
+}
+
+.meta-box {
+    background-color: #f5f5f5;
+    border: 1px solid #cccccc;
+    color: #5a5a5a;
+    float: left;
+    margin: 0px 0px 0px 20px;
+    width: 400px;
+    height: 55px;
+    line-height: 27px;
+    border-radius: 4px;
+    padding: 8px 35px 8px 14px;
+	margin-top: 5px;
+}
