@@ -49,7 +49,7 @@ App.ApplicationRoute = Ember.Route.extend({
 	model: function() {
 		/*  */
 	},
-	events: {
+	actions: {
 		setMetaInfo: function(data) {
 			this.get('controller').play('dblclk');
 		},
@@ -149,17 +149,6 @@ App.ApplicationController = Em.Controller.extend({
 		}
 	},
 	meta_info: '',
-	sortBy: function(el) {
-		var curProp = App.SongsController.get('sortProperties'),
-			prop = el.prop;
-		if ( 0 === Em.compare(prop, curProp) ) {
-			App.SongsController.toggleProperty('sortAscending');
-		} else {
-			App.SongsController.set('sortAscending', true);
-			App.SongsController.set('sortProperties', prop);
-		}
-		App.SortMenuController.select(el);
-	},
 	getFormatMeta: function(data) {
 		data = data || {get: function(){return ''}};
 		return [
@@ -170,7 +159,7 @@ App.ApplicationController = Em.Controller.extend({
 			' (Time: ' + data.get('time') + ')'
 		].join(' | ');
 	},
-	play: function(btn) {
+	play: function(act) {
 		if ( !this.isSelectedSong ) {
 			return;
 		}
@@ -178,7 +167,7 @@ App.ApplicationController = Em.Controller.extend({
 			currSong = {},
 			curListType = '/' +  App.get('currentPath').split('.')[0] + '/';
 
-		switch ( btn ) {
+		switch ( act ) {
 			case 'prev':
 				if ( this.isPlay ) {
 					songId = App.SongsController.prevSongId();
@@ -202,6 +191,22 @@ App.ApplicationController = Em.Controller.extend({
 			currSong = App.Song.find(songId);
 		}
 		this.set('meta_info', this.getFormatMeta(currSong));
+	},
+	actions: {
+		sortBy: function(el) {
+			var curProp = App.SongsController.get('sortProperties'),
+				prop = el.prop;
+			if ( 0 === Em.compare(prop, curProp) ) {
+				App.SongsController.toggleProperty('sortAscending');
+			} else {
+				App.SongsController.set('sortAscending', true);
+				App.SongsController.set('sortProperties', prop);
+			}
+			App.SortMenuController.select(el);
+		},
+		play: function(act) {
+			this.play(act);
+		}
 	}
 });
  
