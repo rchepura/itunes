@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Ember Starter Kit</title>
+  <link rel="stylesheet" href="css/qunit.css">
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/style.css">
@@ -20,13 +21,13 @@
 					</div>
 					<div class="clearfix span8">
 						<div style="float: left;margin-top: 15px;">
-							<div class="round-btn-15 btn disabled">
+							<div  {{bindAttr class=":btn :round-btn-15 isPlay::disabled"}} {{action 'play' 'prev'}}>
 								<i class='icon-arrow-left'></i>
 							</div>
-							<div {{bindAttr class=":btn :round-btn-25 :btn-large isSelectedSong::disabled"}}>
-								<i {{bindAttr class='isPlay:icon-pause:icon-play'}} {{action 'play'}}></i>
-							</div>
-							<div class="btn round-btn-15 disabled">
+							<div {{bindAttr class=":btn :round-btn-25 :btn-large isSelectedSong::disabled"}} {{action 'play'}}>
+								<i {{bindAttr class='isPlay:icon-pause:icon-play'}}></i>
+							</div>							
+							<div  {{bindAttr class=":btn :round-btn-15 isPlay::disabled"}} {{action 'play' 'next'}}>
 								<i class='icon-arrow-right'></i>
 							</div>
 						</div>
@@ -36,10 +37,13 @@
 			</div>
 			<div class="span2">
 				<ul class="nav">
-					{{#each item in model}}
-						<h5 class="accordion-toggle" {{action 'sortBy' item.prop}}>
-							{{item.title}}
-						</h5>
+					{{#each item in App.SortMenuController}}
+						<li {{bindAttr class="item.isActive:active"}}>
+							<h5 class="accordion-toggle" {{action 'sortBy' item}}>
+								<i {{bindAttr class="App.SongsController.sortAscending:icon-arrow-down:icon-arrow-up item.isActive::invisible"}}></i>
+								{{item.title}}
+							</h5>
+						</li>
 					{{/each}}
 				</ul>
 			</div>
@@ -101,17 +105,25 @@
 		{{/linkTo}}
 	</script>
 	
-	<!--------------		Grid View End			-------------->
+	<!--------------		Grid View End			-------------->	
 	
-		
-	</script>
 
 	<script src="js/libs/jquery-1.9.1.js"></script>
+	
+	
 	<script src="js/libs/handlebars-1.0.0.js"></script>
 	<script src="js/libs/ember-1.0.0-rc.7.js"></script>	
 	<script src="js/libs/ember-data-latest.js"></script>
 	<script src="js/playlist.js"></script>
 	<script src="js/app.js"></script>
-
+	
+	<!-- Uncomment next block for unit testing -->
+	
+<!--	
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+	<script src="js/libs/qunit.js"></script>
+	<script src="js/app_unit_test.js"></script>
+-->
 </body>
 </html>

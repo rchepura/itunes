@@ -46,6 +46,10 @@
 	background-color: #DFF0D8;
 }
 
+li.active h5 {
+	background-color: #F2DEDE;
+}
+
 .play-list table a {
 	float: left;
 	padding: 8px 0px;

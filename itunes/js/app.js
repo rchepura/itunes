@@ -4,22 +4,27 @@
 
 window.App = Ember.Application.create({
 	ready: function() {
-		var path = location.hash.substr(1).split('/')[1];
-		if ( -1 == $.inArray(path, ['list', 'grid']) ) {
-			location.hash = '#/list';
-		}
-		// Em.Logger.info('The App is loaded!!!');
+		/*  */
 	}
 	//, LOG_TRANSITIONS_INTERNAL: true
 	//, LOG_TRANSITIONS: true
 });
+
+
+App.Store = DS.Store.extend({
+	revision: 12,
+	adapter : DS.FixtureAdapter.create({
+		simulateRemoteResponse : false
+	})
+});
+
 
 /****************************
 *		 Routing			*
 *****************************/
 
 App.Router.map(function() {
-	// put your routes here
+	// routes
 	this.resource('list', function() {
 		this.resource('list_song', { path: '/:song_id' });
 	});
@@ -30,46 +35,27 @@ App.Router.map(function() {
 
 App.LoadingRoute = Ember.Route.extend({});
 
+App.IndexRoute = Ember.Route.extend({
+	redirect: function() {
+		this.transitionTo('list');
+	}
+});
+
 App.ApplicationRoute = Ember.Route.extend({
 	init: function() {
 		App.SongsController.set('content', App.Song.find());
+		App.SortMenuController.set('content', App.SortMenu.Data);
 	},
 	model: function() {
-		return [{
-			prop: ['title'],
-			title: 'Alphabetical'
-		},{
-			prop: ['genre'],
-			title: 'By Genres'
-		},{
-			prop: ['author'],
-			title: 'By Author'
-		},{
-			prop: ['album'],
-			title: 'By Album'
-		}];
+		/*  */
 	},
 	events: {
 		setMetaInfo: function(data) {
-			var  metaData = this.get('controller').getFormatMeta(data);
-			this.get('controller').set('meta_info', metaData);
+			this.get('controller').play('dblclk');
 		},
 		setSelectedSong: function() {
 			this.get('controller').set('isSelectedSong', true);
 		}
-	}
-});
-
-
-App.ListSongController = Ember.Controller.extend({
-	init: function() {
-		this.send('setSelectedSong');
-	}
-});
-
-App.GridSongController = Ember.Controller.extend({
-	init: function() {
-		this.send('setSelectedSong');
 	}
 });
 
@@ -96,10 +82,18 @@ App.GridRoute = Ember.Route.extend({
 *****************************/
 
 
-App.Store = DS.Store.extend({
-	revision: 12,
-	adapter: 'DS.FixtureAdapter'
+App.SortMenu = Em.Object.extend({
+    title: null,
+	prop: null,
+    isActive: false
 });
+
+App.SortMenu.Data = [
+	App.SortMenu.create({id: 1, prop: ['title'], title: 'Alphabetical', isActive: true}),
+	App.SortMenu.create({id: 2, prop: ['genre'], title: 'By Genres', isActive: false}),
+	App.SortMenu.create({id: 3, prop: ['author'], title: 'By Author', isActive: false}),
+	App.SortMenu.create({id: 4, prop: ['album'], title: 'By Album', isActive: false})
+];
 
 App.Song = DS.Model.extend({
 	title: DS.attr('string'),
@@ -117,7 +111,36 @@ App.Song.FIXTURES = PlayList;
 *		 Controllers		*
 *****************************/
 
+
+App.ListSongController = Ember.Controller.extend({
+	init: function() {
+		this.send('setSelectedSong');
+	}
+});
+
+App.GridSongController = Ember.Controller.extend({
+	init: function() {
+		this.send('setSelectedSong');
+	}
+});
+
+
+App.SortMenuController = Em.ArrayController.create({
+	select: function(el) {
+		this.forEach(function(item) {
+			if ( el.get('id') == item.get('id') ) {
+				item.set('isActive', true);
+			} else {
+				item.set('isActive', false);
+			}
+		});
+	}
+});
+
 App.ApplicationController = Em.Controller.extend({
+	currentPathDidChange: function() {
+		App.set('currentPath', this.get('currentPath'));
+	}.observes('currentPath'),
 	isPlay: false,
 	isSelectedSong: false,
 	getCurrSongId: function() {
@@ -126,35 +149,57 @@ App.ApplicationController = Em.Controller.extend({
 		}
 	},
 	meta_info: '',
-	sortBy: function(prop) {
-		var curProp = App.SongsController.get('sortProperties');
+	sortBy: function(el) {
+		var curProp = App.SongsController.get('sortProperties'),
+			prop = el.prop;
 		if ( 0 === Em.compare(prop, curProp) ) {
 			App.SongsController.toggleProperty('sortAscending');
 		} else {
 			App.SongsController.set('sortAscending', true);
 			App.SongsController.set('sortProperties', prop);
 		}
+		App.SortMenuController.select(el);
 	},
 	getFormatMeta: function(data) {
 		data = data || {get: function(){return ''}};
 		return [
-			'Title: ' + data.get('title'),
+			data.get('id') + '. Title: ' + data.get('title'),
 			'Author: ' + data.get('author'),
 			'Album: ' + data.get('album'),
 			'Genres: ' + data.get('genre'),
 			' (Time: ' + data.get('time') + ')'
 		].join(' | ');
 	},
-	play: function() {
+	play: function(btn) {
 		if ( !this.isSelectedSong ) {
 			return;
 		}
-		var currSongId = this.getCurrSongId(),
-			currSong = {};
-			
-		this.set('isPlay', !this.get('isPlay'));
-		if ( currSongId ) {
-			currSong = App.Song.find(currSongId);
+		var songId = this.getCurrSongId(),
+			currSong = {},
+			curListType = '/' +  App.get('currentPath').split('.')[0] + '/';
+
+		switch ( btn ) {
+			case 'prev':
+				if ( this.isPlay ) {
+					songId = App.SongsController.prevSongId();
+					this.transitionToRoute(curListType + songId);
+				}
+			break;
+			case 'next':
+				if ( this.isPlay ) {
+					songId = App.SongsController.nextSongId();
+					this.transitionToRoute(curListType + songId);
+				}
+			break;
+			case 'dblclk':
+				this.set('isPlay', true);
+			break;
+			default:				
+				this.toggleProperty('isPlay');
+				
+		}
+		if ( songId ) {
+			currSong = App.Song.find(songId);
 		}
 		this.set('meta_info', this.getFormatMeta(currSong));
 	}
@@ -166,7 +211,35 @@ App.ListController = Em.ArrayController.extend({
 
 App.SongsController = Ember.ArrayController.create({
 	sortProperties: ['title'],
-	sortAscending: true
+	sortAscending: true,
+	currSongIndex: function() {
+		var curSongId = false,
+			songIdx = false;		
+		
+		if ( $.isPlainObject(App.Router.router.currentParams) ) {
+			curSongId = App.Router.router.currentParams.song_id || false;
+			if ( false !== curSongId ) {
+				this.filter(function(elem, idx) {
+					if ( curSongId == elem.id ) {
+						songIdx = idx;
+						return true;
+					}
+				});
+			}
+		}
+		return songIdx;
+	},
+	nextSongId: function() {
+		var next = ( this.currSongIndex() || 0 ) + 1;
+		next = ( next >= this.get('length') ) ? 0 : next;
+
+		return this.nextObject(next).get('id');
+	},
+	prevSongId: function() {
+		var prev = ( this.currSongIndex() || this.get('length') ) - 1;
+
+		return this.nextObject(prev).get('id');
+	}
 });
 
 /****************************
@@ -202,8 +275,6 @@ App.SongsGridView = Ember.CollectionView.extend({
 	itemViewClass: App.SongGridView,
 	content: App.SongsController
 });
-
-
 
 
 
